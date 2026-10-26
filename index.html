@@ -74,7 +74,7 @@ form{display:grid;gap:12px}label{font-size:12px;font-weight:650;color:var(--mute
  </section>
  <section class="screen" id="settingsScreen">
   <div class="section-head"><h2>Sécurité et données</h2></div>
-  <div class="card" style="margin-bottom:12px"><h3 style="margin-top:0">Version de l’application</h3><div style="display:flex;align-items:center;justify-content:space-between;gap:12px"><strong id="appVersion">Mon Budget v1.4.0</strong><span class="small">Version installée</span></div><p class="small" style="line-height:1.5;margin-bottom:0">Si une mise à jour est publiée mais n’apparaît pas, ferme puis rouvre l’application, ou actualise la page dans Safari.</p></div>
+  <div class="card" style="margin-bottom:12px"><h3 style="margin-top:0">Version de l’application</h3><div style="display:flex;align-items:center;justify-content:space-between;gap:12px"><strong id="appVersion">Mon Budget v1.4.1</strong><span class="small">Version installée</span></div><p class="small" style="line-height:1.5;margin-bottom:0">Si une mise à jour est publiée mais n’apparaît pas, ferme puis rouvre l’application, ou actualise la page dans Safari.</p></div>
   <div class="card" style="margin-bottom:12px"><h3 style="margin-top:0">Mode test</h3><p class="small" style="line-height:1.5">Ajoute des exemples fictifs de revenus et de dépenses pour vérifier les totaux, le graphique et les listes. Ces opérations sont marquées « TEST » et n’affectent pas tes vraies opérations. Tu peux les retirer en un bouton.</p><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="primary" id="addTestData">Ajouter des données aléatoires</button><button class="danger" id="removeTestData">Supprimer les données de test</button></div><p id="testStatus" class="small" style="margin-bottom:0" aria-live="polite"></p></div>
   <div class="card" style="margin-bottom:12px"><h3 style="margin-top:0">Budget mensuel cible</h3><form id="targetForm"><label>Montant cible des dépenses (€)<input id="targetAmount" type="number" min="0" step=".01" placeholder="Ex. 1800"></label><button class="primary">Enregistrer le budget cible</button></form></div>
   <div class="card" style="margin-bottom:12px"><h3 style="margin-top:0">Verrouillage</h3><p class="small">Le coffre-fort se verrouille automatiquement lorsque tu quittes l'application ou après 2 minutes sans activité pendant qu'elle est ouverte. La biométrie est proposée uniquement si le navigateur et l'appareil la prennent en charge; ce n'est pas un Face ID natif garanti.</p><button class="ghost" id="lockNow">Verrouiller maintenant</button></div>
@@ -115,7 +115,34 @@ function lockApp(){vaultKey=null;state={transactions:[],target:0,fixedCharges:[]
 function startIdleLock(){clearTimeout(idleTimer);idleTimer=setTimeout(lockApp,120000)}
 ['click','keydown','touchstart'].forEach(ev=>document.addEventListener(ev,()=>{if(vaultKey)startIdleLock()},{passive:true}));
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&vaultKey){clearTimeout(lockTimeout);lockTimeout=setTimeout(lockApp,120000)}else if(!document.hidden&&vaultKey)startIdleLock()});
-$('unlockForm').onsubmit=async e=>{e.preventDefault();const pw=$('masterPassword').value;const exists=!!localStorage.getItem(META_KEY);if(pw.length<10){$('lockStatus').textContent='Choisis au moins 10 caractères.';return}if(!exists&&pw!==$('confirmPassword').value){$('lockStatus').textContent='Les mots de passe ne correspondent pas.';return}if(!exists&&pw.length<12){$('lockStatus').textContent='Pour plus de sécurité, utilise au moins 12 caractères.';return} $('unlockBtn').disabled=true;try{if(exists)await unlock(pw);else await createVault(pw)}catch(err){$('lockStatus').textContent='Mot de passe incorrect ou données illisibles.';vaultKey=null}finally{$('unlockBtn').disabled=false}};
+$('unlockForm').onsubmit=async e=>{
+ e.preventDefault();
+ const pw=$('masterPassword').value;
+ const exists=!!localStorage.getItem(META_KEY);
+ if(pw.length<10){$('lockStatus').textContent='Le mot de passe doit contenir au moins 10 caractères.';return}
+ if(!exists&&pw!==$('confirmPassword').value){$('lockStatus').textContent='Les mots de passe ne correspondent pas.';return}
+ if(!exists&&pw.length<12){$('lockStatus').textContent='Pour plus de sécurité, utilise au moins 12 caractères.';return}
+ $('unlockBtn').disabled=true;
+ $('lockStatus').textContent='Vérification du coffre-fort…';
+ try {
+   if(exists) {
+     try { await unlock(pw); }
+     catch(err) {
+       vaultKey=null;
+       console.error('Mon Budget: échec du déverrouillage',err);
+       const msg=String(err&&err.message||err);
+       $('lockStatus').textContent=(err&&err.name==='OperationError')
+         ? 'Mot de passe incorrect, ou coffre-fort chiffré illisible. Tes données n’ont pas été supprimées.'
+         : 'Erreur au déverrouillage : '+msg+'. Tes données n’ont pas été supprimées.';
+     }
+   } else {
+     await createVault(pw);
+   }
+ } catch(err) {
+   console.error('Mon Budget: erreur de démarrage',err);
+   $('lockStatus').textContent='Erreur : '+String(err&&err.message||err)+'. Tes données existantes n’ont pas été supprimées.';
+ } finally {$('unlockBtn').disabled=false;}
+};
 $('faceIdBtn').onclick=()=>{$('lockStatus').textContent='Dans cette version web, Face ID natif n’est pas disponible de façon fiable. Utilise le mot de passe maître; le verrouillage de l’iPhone ajoute une protection complémentaire.'};
 function monthItems(){return state.transactions.filter(t=>monthKey(t.date)===currentMonth()).sort((a,b)=>b.date.localeCompare(a.date)||b.created-a.created)}
 function totals(){const a=monthItems();return {income:a.filter(t=>t.kind==='income'&&t.paid).reduce((s,t)=>s+t.amount,0),expense:a.filter(t=>t.kind==='expense'&&t.paid).reduce((s,t)=>s+t.amount,0),unpaid:a.filter(t=>t.kind==='expense'&&!t.paid).reduce((s,t)=>s+t.amount,0),items:a}}
