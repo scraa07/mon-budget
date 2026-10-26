@@ -1,0 +1,11 @@
+{
+  "name":"Mon Budget sécurisé",
+  "short_name":"Budget",
+  "description":"Suivi personnel des revenus, dépenses et factures avec coffre-fort chiffré",
+  "start_url":"./index.html",
+  "scope":"./",
+  "display":"standalone",
+  "background_color":"#f4f6fa",
+  "theme_color":"#173b70",
+  "icons":[{"src":"icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]
+}
