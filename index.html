@@ -27,10 +27,10 @@ form{display:grid;gap:12px}label{font-size:12px;font-weight:650;color:var(--mute
   <div style="font-size:36px;margin-bottom:15px">🔐</div>
   <h1 id="lockTitle">Mon Budget sécurisé</h1>
   <p id="lockIntro">Tes données sont chiffrées avant leur enregistrement sur cet appareil. Définis un mot de passe solide pour commencer.</p>
-  <form id="unlockForm">
-   <label id="passwordLabel">Mot de passe maître<input id="masterPassword" type="password" minlength="10" autocomplete="current-password" required placeholder="10 caractères minimum"></label>
+  <form id="unlockForm" novalidate>
+   <label id="passwordLabel">Mot de passe maître<input id="masterPassword" type="password" autocomplete="current-password" placeholder="Mot de passe maître"></label>
    <label id="confirmLabel">Confirmer le mot de passe<input id="confirmPassword" type="password" minlength="10" autocomplete="new-password" placeholder="Retape le mot de passe"></label>
-   <button class="primary" id="unlockBtn" type="submit">Créer mon coffre-fort</button>
+   <button class="primary" id="unlockBtn" type="button">Créer mon coffre-fort</button>
   </form>
   <button id="faceIdBtn" class="ghost hidden" style="margin-top:10px">Utiliser l'authentification de l'appareil</button>
   <div id="lockStatus" class="lock-status"></div>
@@ -72,19 +72,39 @@ form{display:grid;gap:12px}label{font-size:12px;font-weight:650;color:var(--mute
   <p class="small" style="line-height:1.5">Les charges actives sont générées pour le mois en cours à l'ouverture de l'application. Tu peux modifier ou désactiver chaque charge. Une seule occurrence est créée par charge et par mois.</p>
   <div class="list" id="fixedList"></div>
  </section>
+ <section class="screen" id="historyScreen">
+  <div class="section-head"><h2>Historique & prévisions</h2></div>
+  <div class="card" style="margin-bottom:12px">
+   <h3 style="margin-top:0">Choisir un mois</h3>
+   <label>Mois à consulter<input id="historyMonth" type="month"></label>
+   <div class="cards" style="margin-top:12px">
+    <div class="card"><div class="stat-title">Revenus prévus / reçus</div><div class="stat positive" id="historyIncome">0 €</div></div>
+    <div class="card"><div class="stat-title">Dépenses payées</div><div class="stat negative" id="historyPaid">0 €</div></div>
+    <div class="card"><div class="stat-title">Débits à venir</div><div class="stat" id="historyUnpaid">0 €</div></div>
+    <div class="card"><div class="stat-title">Solde estimé</div><div class="stat" id="historyBalance">0 €</div></div>
+   </div>
+   <p class="small" id="historyNote" style="line-height:1.5;margin-bottom:0">Les mois passés affichent l’historique enregistré. Les mois futurs affichent les opérations prévisionnelles et les factures planifiées.</p>
+  </div>
+  <div class="section-head"><h2>Opérations du mois choisi</h2><button class="primary" id="addPlanned">＋ Prévoir une opération</button></div>
+  <div class="list" id="historyList"></div>
+  <div class="card" style="margin-top:12px">
+   <h3 style="margin-top:0">Prévoir un débit différé</h3>
+   <p class="small" style="line-height:1.5;margin-bottom:0">Ajoute une opération prévisionnelle, choisis la date estimée du prélèvement dans le champ « Date » puis coche « Débit différé / prévisionnel ». Elle apparaîtra dans le mois choisi sans être comptée comme déjà payée.</p>
+  </div>
+ </section>
  <section class="screen" id="settingsScreen">
   <div class="section-head"><h2>Sécurité et données</h2></div>
-  <div class="card" style="margin-bottom:12px"><h3 style="margin-top:0">Version de l’application</h3><div style="display:flex;align-items:center;justify-content:space-between;gap:12px"><strong id="appVersion">Mon Budget v1.4.2</strong><span class="small">Version installée</span></div><p class="small" style="line-height:1.5;margin-bottom:0">Si une mise à jour est publiée mais n’apparaît pas, ferme puis rouvre l’application, ou actualise la page dans Safari.</p></div>
+  <div class="card" style="margin-bottom:12px"><h3 style="margin-top:0">Version de l’application</h3><div style="display:flex;align-items:center;justify-content:space-between;gap:12px"><strong id="appVersion">Mon Budget v1.5.0</strong><span class="small">Version installée</span></div><p class="small" style="line-height:1.5;margin-bottom:0">Si une mise à jour est publiée mais n’apparaît pas, ferme puis rouvre l’application, ou actualise la page dans Safari.</p></div>
   <div class="card" style="margin-bottom:12px"><h3 style="margin-top:0">Mode test</h3><p class="small" style="line-height:1.5">Ajoute des exemples fictifs de revenus et de dépenses pour vérifier les totaux, le graphique et les listes. Ces opérations sont marquées « TEST » et n’affectent pas tes vraies opérations. Tu peux les retirer en un bouton.</p><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="primary" id="addTestData">Ajouter des données aléatoires</button><button class="danger" id="removeTestData">Supprimer les données de test</button></div><p id="testStatus" class="small" style="margin-bottom:0" aria-live="polite"></p></div>
   <div class="card" style="margin-bottom:12px"><h3 style="margin-top:0">Budget mensuel cible</h3><form id="targetForm"><label>Montant cible des dépenses (€)<input id="targetAmount" type="number" min="0" step=".01" placeholder="Ex. 1800"></label><button class="primary">Enregistrer le budget cible</button></form></div>
   <div class="card" style="margin-bottom:12px"><h3 style="margin-top:0">Verrouillage</h3><p class="small">Le coffre-fort se verrouille automatiquement lorsque tu quittes l'application ou après 2 minutes sans activité pendant qu'elle est ouverte. La biométrie est proposée uniquement si le navigateur et l'appareil la prennent en charge; ce n'est pas un Face ID natif garanti.</p><button class="ghost" id="lockNow">Verrouiller maintenant</button></div>
   <div class="card"><h3 style="margin-top:0">Sauvegarde chiffrée</h3><p class="small">La sauvegarde exportée reste chiffrée avec ton mot de passe maître. Garde-la dans un endroit sûr.</p><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="ghost" id="exportBtn">Exporter chiffré</button><button class="ghost" id="importBtn">Restaurer sauvegarde</button><input id="importFile" type="file" accept=".mbvault,application/octet-stream" hidden></div><p class="notice">Si tu oublies le mot de passe maître, il n'existe aucun moyen de récupérer la sauvegarde chiffrée.</p></div>
  </section>
 </main>
-<nav id="appNav" class="hidden"><button class="active" data-screen="homeScreen"><span>⌂</span>Accueil</button><button data-screen="transactionsScreen"><span>↕</span>Opérations</button><button data-screen="billsScreen"><span>▤</span>Factures</button><button data-screen="fixedScreen"><span>↻</span>Charges fixes</button><button data-screen="settingsScreen"><span>⚙</span>Sécurité</button></nav>
+<nav id="appNav" class="hidden"><button class="active" data-screen="homeScreen"><span>⌂</span>Accueil</button><button data-screen="transactionsScreen"><span>↕</span>Opérations</button><button data-screen="billsScreen"><span>▤</span>Factures</button><button data-screen="fixedScreen"><span>↻</span>Charges fixes</button><button data-screen="historyScreen"><span>▦</span>Historique</button><button data-screen="settingsScreen"><span>⚙</span>Sécurité</button></nav>
 <div class="modal" id="modal"><div class="sheet"><div class="sheet-head"><h2 id="formTitle">Ajouter une opération</h2><button class="x" id="closeModal">×</button></div><form id="transactionForm">
  <div class="form-grid"><label>Type<select id="kind"><option value="expense">Dépense</option><option value="income">Revenu</option></select></label><label>Catégorie<select id="category"><option>Logement</option><option>Électricité</option><option>Eau</option><option>Courses</option><option>Transport</option><option>Assurance</option><option>Santé</option><option>Enfant</option><option>Loisirs</option><option>Salaire</option><option>Aide / allocation</option><option>Autre</option></select></label></div>
- <label>Libellé<input id="title" required maxlength="80" placeholder="Ex. Crédit immobilier"></label><div class="form-grid"><label>Montant (€)<input id="amount" required type="number" min=".01" step=".01" placeholder="900,00"></label><label>Date<input id="date" required type="date"></label></div><label class="checkrow"><input id="paid" type="checkbox" checked> Déjà payé / encaissé</label><label class="checkrow"><input id="recurring" type="checkbox"> Charge fixe mensuelle automatique</label><button class="primary" type="submit">Enregistrer dans le coffre-fort</button>
+ <label>Libellé<input id="title" required maxlength="80" placeholder="Ex. Crédit immobilier"></label><div class="form-grid"><label>Montant (€)<input id="amount" required type="number" min=".01" step=".01" placeholder="900,00"></label><label>Date<input id="date" required type="date"></label></div><label class="checkrow"><input id="paid" type="checkbox" checked> Déjà payé / encaissé</label><label class="checkrow"><input id="recurring" type="checkbox"> Charge fixe mensuelle automatique</label><label class="checkrow"><input id="deferredDebit" type="checkbox"> Débit différé / prévisionnel (non encore débité)</label><p class="small" style="line-height:1.4">Pour une carte à débit différé, choisis la date estimée du prélèvement dans le champ « Date ».</p><button class="primary" type="submit">Enregistrer dans le coffre-fort</button>
  </form></div></div>
 <div class="modal" id="fixedModal"><div class="sheet"><div class="sheet-head"><h2 id="fixedFormTitle">Nouvelle charge fixe</h2><button class="x" id="closeFixedModal">×</button></div><form id="fixedForm">
  <label>Nom de la charge<input id="fixedTitle" required maxlength="80" placeholder="Ex. Crédit immobilier"></label>
@@ -115,39 +135,52 @@ function lockApp(){vaultKey=null;state={transactions:[],target:0,fixedCharges:[]
 function startIdleLock(){clearTimeout(idleTimer);idleTimer=setTimeout(lockApp,120000)}
 ['click','keydown','touchstart'].forEach(ev=>document.addEventListener(ev,()=>{if(vaultKey)startIdleLock()},{passive:true}));
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&vaultKey){clearTimeout(lockTimeout);lockTimeout=setTimeout(lockApp,120000)}else if(!document.hidden&&vaultKey)startIdleLock()});
-$('unlockForm').onsubmit=async e=>{
- e.preventDefault();
+async function runUnlock(e){
+ if(e){e.preventDefault();e.stopPropagation();}
+ $('lockStatus').textContent='Bouton activé : vérification…';
  const pw=$('masterPassword').value;
  const exists=!!localStorage.getItem(META_KEY);
- if(pw.length<10){$('lockStatus').textContent='Le mot de passe doit contenir au moins 10 caractères.';return}
+ if(!pw){$('lockStatus').textContent='Saisis ton mot de passe maître.';return}
  if(!exists&&pw!==$('confirmPassword').value){$('lockStatus').textContent='Les mots de passe ne correspondent pas.';return}
- if(!exists&&pw.length<12){$('lockStatus').textContent='Pour plus de sécurité, utilise au moins 12 caractères.';return}
+ if(!exists&&pw.length<12){$('lockStatus').textContent='Choisis au moins 12 caractères.';return}
  $('unlockBtn').disabled=true;
- $('lockStatus').textContent='Vérification du coffre-fort…';
  try {
-   if(exists) {
-     try { await unlock(pw); }
-     catch(err) {
-       vaultKey=null;
-       console.error('Mon Budget: échec du déverrouillage',err);
-       const msg=String(err&&err.message||err);
-       $('lockStatus').textContent=(err&&err.name==='OperationError')
-         ? 'Mot de passe incorrect, ou coffre-fort chiffré illisible. Tes données n’ont pas été supprimées.'
-         : 'Erreur au déverrouillage : '+msg+'. Tes données n’ont pas été supprimées.';
-     }
-   } else {
-     await createVault(pw);
-   }
+   if(exists) await unlock(pw);
+   else await createVault(pw);
  } catch(err) {
-   console.error('Mon Budget: erreur de démarrage',err);
-   $('lockStatus').textContent='Erreur : '+String(err&&err.message||err)+'. Tes données existantes n’ont pas été supprimées.';
+   vaultKey=null;
+   console.error('Mon Budget v1.5.0 — erreur de connexion',err);
+   $('lockStatus').textContent=(err&&err.name==='OperationError')
+    ? 'Mot de passe incorrect ou coffre-fort illisible. Aucune donnée supprimée.'
+    : 'Erreur de connexion : '+String(err&&err.message||err)+'. Aucune donnée supprimée.';
  } finally {$('unlockBtn').disabled=false;}
-};
+}
+$('unlockBtn').addEventListener('click',runUnlock);
+$('unlockForm').onsubmit=runUnlock;
+$('unlockForm').onsubmit=runUnlock;
 $('faceIdBtn').onclick=()=>{$('lockStatus').textContent='Dans cette version web, Face ID natif n’est pas disponible de façon fiable. Utilise le mot de passe maître; le verrouillage de l’iPhone ajoute une protection complémentaire.'};
 function monthItems(){return state.transactions.filter(t=>monthKey(t.date)===currentMonth()).sort((a,b)=>b.date.localeCompare(a.date)||b.created-a.created)}
 function totals(){const a=monthItems();return {income:a.filter(t=>t.kind==='income'&&t.paid).reduce((s,t)=>s+t.amount,0),expense:a.filter(t=>t.kind==='expense'&&t.paid).reduce((s,t)=>s+t.amount,0),unpaid:a.filter(t=>t.kind==='expense'&&!t.paid).reduce((s,t)=>s+t.amount,0),items:a}}
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function row(t){const icon=t.kind==='income'?'↙':(t.recurring?'↻':'↗');return `<div class="item"><div class="symbol">${icon}</div><div class="details"><div class="item-title">${esc(t.title)}</div><div class="item-meta">${esc(t.category)} · ${new Date(t.date+'T12:00:00').toLocaleDateString('fr-FR')}</div>${t.isDemo?'<span class="badge" style="color:#b8c7ff;background:#263452">TEST</span>':''}${!t.paid?'<span class="badge">À payer</span>':''}</div><div style="text-align:right"><div class="item-amount ${t.kind==='income'?'income':''}">${t.kind==='income'?'+':'−'}${fmt(t.amount)}</div><button class="small markPaid" data-id="${t.id}" style="border:0;background:transparent;padding:6px 0">${t.paid?'Supprimer':'Marquer payé'}</button></div></div>`}
+function monthTitle(key){if(!key)return '';const [y,m]=key.split('-').map(Number);return new Date(y,m-1,1).toLocaleDateString('fr-FR',{month:'long',year:'numeric'})}
+function historyItems(key){return state.transactions.filter(t=>monthKey(t.date)===key).sort((a,b)=>a.date.localeCompare(b.date)||(a.created||0)-(b.created||0))}
+function renderHistory(){
+ const input=$('historyMonth');if(!input)return;
+ if(!input.value)input.value=currentMonth();
+ const key=input.value,items=historyItems(key);
+ const income=items.filter(t=>t.kind==='income').reduce((s,t)=>s+t.amount,0);
+ const paid=items.filter(t=>t.kind==='expense'&&t.paid).reduce((s,t)=>s+t.amount,0);
+ const unpaid=items.filter(t=>t.kind==='expense'&&!t.paid).reduce((s,t)=>s+t.amount,0);
+ $('historyIncome').textContent=fmt(income);
+ $('historyPaid').textContent=fmt(paid);
+ $('historyUnpaid').textContent=fmt(unpaid);
+ $('historyBalance').textContent=fmt(income-paid-unpaid);
+ const nowKey=currentMonth();
+ $('historyNote').textContent=key<nowKey?'Historique du mois passé : seules les opérations enregistrées sont affichées.':key>nowKey?'Prévisionnel : les montants non payés restent des prévisions et ne sont pas considérés comme débités.':'Mois en cours : les opérations payées et les débits prévus sont regroupés ici.';
+ $('historyList').innerHTML=items.length?items.map(row).join(''):'<div class="empty">Aucune opération enregistrée pour '+esc(monthTitle(key))+'. Tu peux en ajouter une avec « Prévoir une opération ».</div>';
+ bindRows($('historyList'));
+}
+function row(t){const icon=t.kind==='income'?'↙':(t.recurring?'↻':'↗');return `<div class="item"><div class="symbol">${icon}</div><div class="details"><div class="item-title">${esc(t.title)}</div><div class="item-meta">${esc(t.category)} · ${new Date(t.date+'T12:00:00').toLocaleDateString('fr-FR')}</div>${t.isDemo?'<span class="badge" style="color:#b8c7ff;background:#263452">TEST</span>':''}${t.deferredDebit?'<span class="badge" style="color:#ffb454;background:#3a2c1a">Débit différé</span>':''}${!t.paid?'<span class="badge">À payer</span>':''}</div><div style="text-align:right"><div class="item-amount ${t.kind==='income'?'income':''}">${t.kind==='income'?'+':'−'}${fmt(t.amount)}</div><button class="small markPaid" data-id="${t.id}" style="border:0;background:transparent;padding:6px 0">${t.paid?'Supprimer':'Marquer payé'}</button></div></div>`}
 function bindRows(container){container.querySelectorAll('.markPaid').forEach(b=>b.onclick=async()=>{const t=state.transactions.find(x=>x.id===b.dataset.id);if(!t)return;if(t.paid){if(confirm('Supprimer cette opération ?'))state.transactions=state.transactions.filter(x=>x.id!==t.id)}else t.paid=true;await persist();render()})}
 function render(){const t=totals(),rem=t.income-t.expense-t.unpaid;$('monthLabel').textContent=new Date().toLocaleDateString('fr-FR',{month:'long',year:'numeric'});$('remaining').textContent=fmt(rem);$('incomeTotal').textContent=fmt(t.income);$('expenseTotal').textContent=fmt(t.expense);$('unpaidTotal').textContent=fmt(t.unpaid);$('countTotal').textContent=t.items.length;$('billsTotal').textContent=fmt(t.unpaid);$('budgetProgress').style.width=(state.target>0?Math.min(100,(t.expense+t.unpaid)/state.target*100):0)+'%';$('targetAmount').value=state.target||'';const recent=t.items.slice(0,5);$('recentList').innerHTML=recent.length?recent.map(row).join(''):'<div class="empty">Aucune opération ce mois-ci. Ajoute un revenu ou une dépense pour commencer.</div>';$('allList').innerHTML=t.items.length?t.items.map(row).join(''):'<div class="empty">Aucune opération pour ce mois.</div>';const bills=t.items.filter(x=>x.kind==='expense'&&!x.paid);$('billsList').innerHTML=bills.length?bills.map(row).join(''):'<div class="empty">Aucune facture en attente. 🎉</div>';
 const totalSpent=t.expense+t.unpaid, denom=t.income>0?t.income:totalSpent, circumference=2*Math.PI*62;
@@ -162,7 +195,7 @@ $('chartPaidPct').textContent=denom>0?Math.round(t.expense/denom*100)+' %':'0 %'
 $('chartUnpaidPct').textContent=denom>0?Math.round(t.unpaid/denom*100)+' %':'0 %';
 $('chartRemainingPct').textContent=t.income>0?Math.max(0,Math.round((t.income-totalSpent)/t.income*100))+' %':'—';
 $('chartFootnote').textContent=t.income>0?'Pourcentages calculés par rapport aux revenus encaissés.':'Aucun revenu enregistré : répartition calculée sur les dépenses du mois.';
-renderFixed();['recentList','allList','billsList'].forEach(id=>bindRows($(id)))}
+renderFixed();['recentList','allList','billsList'].forEach(id=>bindRows($(id)));renderHistory()}
 
 function dateForMonth(year,month,day){const last=new Date(year,month+1,0).getDate();return `${year}-${String(month+1).padStart(2,'0')}-${String(Math.min(day,last)).padStart(2,'0')}`}
 function generateMonthlyCharges(){
@@ -202,7 +235,17 @@ $('deleteFixed').onclick=async()=>{if(!editingFixedId)return;if(!confirm('Suppri
 
 function openForm(asBill=false){$('transactionForm').reset();$('date').value=today();$('kind').value='expense';$('paid').checked=!asBill;$('category').value=asBill?'Logement':'Autre';$('formTitle').textContent=asBill?'Ajouter une facture':'Ajouter une opération';$('modal').classList.add('open')}
 $('quickAdd').onclick=()=>openForm();$('addTransaction2').onclick=()=>openForm();$('addBill').onclick=()=>openForm(true);$('closeModal').onclick=()=>$('modal').classList.remove('open');$('modal').onclick=e=>{if(e.target===$('modal'))$('modal').classList.remove('open')};
-$('transactionForm').onsubmit=async e=>{e.preventDefault();const amount=Number($('amount').value);if(!amount||amount<=0)return;state.transactions.push({id:crypto.randomUUID?crypto.randomUUID():String(Date.now()),title:$('title').value.trim(),amount,date:$('date').value,kind:$('kind').value,category:$('category').value,paid:$('kind').value==='income'?true:$('paid').checked,recurring:$('recurring').checked,created:Date.now()});$('modal').classList.remove('open');await persist();render()};
+$('transactionForm').onsubmit=async e=>{e.preventDefault();const amount=Number($('amount').value);if(!amount||amount<=0)return;state.transactions.push({id:crypto.randomUUID?crypto.randomUUID():String(Date.now()),title:$('title').value.trim(),amount,date:$('date').value,kind:$('kind').value,category:$('category').value,paid:$('kind').value==='income'?true:$('paid').checked,recurring:$('recurring').checked,deferredDebit:$('deferredDebit').checked,created:Date.now()});$('modal').classList.remove('open');await persist();render()};
+$('historyMonth').value=currentMonth();
+$('historyMonth').onchange=()=>renderHistory();
+$('addPlanned').onclick=()=>{
+ const key=$('historyMonth').value||currentMonth();
+ $('formTitle').textContent='Prévoir une opération';
+ $('transactionForm').reset();
+ $('date').value=key+'-15';
+ $('kind').value='expense';$('category').value='Autre';$('paid').checked=false;$('recurring').checked=false;$('deferredDebit').checked=true;
+ $('modal').classList.add('open');
+};
 $('kind').onchange=()=>{$('paid').parentElement.lastChild.textContent=$('kind').value==='income'?' Déjà encaissé':' Déjà payé / encaissé'};
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('active',x===b));document.querySelectorAll('.screen').forEach(x=>x.classList.toggle('active',x.id===b.dataset.screen));window.scrollTo({top:0,behavior:'smooth'})});
 $('allTransactions').onclick=()=>document.querySelector('nav button[data-screen="transactionsScreen"]').click();
